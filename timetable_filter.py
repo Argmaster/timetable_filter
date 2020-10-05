@@ -29,9 +29,7 @@ def parse_out_grups(timetable):
     # *
     # convert sets to alphabetically sorted lists
     # *
-    possible_groups = dict(
-        {sub: sorted(possible_groups[sub]) for sub in subjects}
-    )
+    possible_groups = dict({sub: sorted(possible_groups[sub]) for sub in subjects})
     for sub in sorted(subjects, key=lambda x: x[1]):
         print(f"{sub[1]: <5} {sub[0]}")
     # *
@@ -161,9 +159,9 @@ def forge_html_table(timetable):
                 day_row[
                     i
                 ] += f"""
-                    <div class="hour{sub['godz'][:-3]} l{sub['len']} data_cell t_{sub['typ'].replace(".", "")}">
+                    <div class="hour{sub['godz'][:-3]} l{sub['len']} data-cell t_{sub['typ'].replace(".", "")}">
                         <div class="inner-cell">
-                            <div class="sub_title">
+                            <div class="sub-title">
                             <div class="subject">{sub['przedmiot']}</div>
                             <div class="stype">{sub['typ']}</div>
                             </div>
@@ -179,7 +177,11 @@ def forge_html_table(timetable):
         0,
         "".join(
             [
-                f"""<div class="data_cell l1 hour{i}">{i}.00</div>"""
+                f"""<div class="data-cell l1 hour{i}">
+                    <div class="inner-cell">
+                        {i}.00
+                    </div>
+                </div>"""
                 for i in range(8, 20)
             ]
         ),
@@ -188,6 +190,15 @@ def forge_html_table(timetable):
     style = "".join(
         [f".hour{i}{{top: {5 * (i - 8) + 2}em;}}\n" for i in range(8, 20)]
     ) + "".join([f".l{i}{{height: {5 * i}em;}}\n" for i in range(1, 6)])
+    try:
+        with open("timetable.css", "r", encoding="utf-8") as file:
+            style += file.read()
+    except FileNotFoundError:
+        if "no" == askquestion(
+            "CSS file not found",
+            "Program was unable to find file timetable.css, without task cannot be fully completed. Continue?",
+        ):
+            exit()
     return f"""
         <!doctype html>
         <html lang="pl">
@@ -196,8 +207,8 @@ def forge_html_table(timetable):
                 <title>Filtered timetable</title>
                 <meta name="description" content="">
                 <meta name="author" content="KW">
-                <link rel="stylesheet" href="timetable.css">
                 <style>{style}</style>
+                <link rel="stylesheet" href="timetable.css">
             </head><body>
             <div class="timetable">
             {"".join(f'<div class="column {"time_column" if not i else ""}">{day}</div>' for i, day in enumerate(day_row))}
