@@ -6,9 +6,6 @@ import os
 import pickle
 
 
-CHAR_TO_INT = {"A": 1, "B": 2, "C": 3, "D": 4, "E": 5, "F": 6}
-
-
 def parse_out_grups(timetable):
     possible_groups = dict()
     for hour in timetable:
